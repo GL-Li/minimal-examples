@@ -1,0 +1,35 @@
+---
+title: "shiny reactive"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+An expression in Shiny server can be defined as reactive if it depends on input values. The benefit of reactive expression is that its result can be reused, like a function. The result of a reactive expression is updated whenever the input values changes. When use a reactive expression named `aaa`, it must be in the form `aaa()`.
+
+```{r}
+library(shiny)
+ui <- fluidPage(
+  sliderInput("number", label = "Slide to choose number", min = 10, max = 50, value = 30),
+  textOutput("show_number"),
+  plotOutput("hist")
+)
+
+server <- function(input, output){
+  # set a reactive variable
+  n <- reactive({
+    x <- input$number
+    x^2
+  })
+  
+  # use the reactive variabel in the form of n()
+  output$show_number <- renderText({paste0("The number square is ", n())})
+  output$hist <- renderPlot({hist(rnorm(n()), breaks = 50)})
+}
+
+shinyApp(ui, server, options = list(height = 600))
+```
+
